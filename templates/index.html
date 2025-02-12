@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KnowFlow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <style>
+        /* Theme Variables */
+        :root {
+            --color-primary: #6366F1;
+            --color-secondary: #4F46E5;
+            --color-dark: #1F2937;
+            --color-light: #F3F4F6;
+            --chat-max-width: 85%;
+            --message-spacing: 1.5rem;
+            --ai-message-bg: #f3f4f6;
+            --ai-message-text: #1f2937;
+        }
+
+        @layer base {
+            body {
+                @apply bg-gray-50 h-screen flex flex-col;
+            }
+        }
+
+        @layer components {
+            .chat-bubble {
+                @apply p-4 rounded-2xl max-w-[var(--chat-max-width)];
+            }
+
+            .typing-indicator {
+                @apply flex items-center gap-2 text-gray-500;
+            }
+
+            /* Custom color classes */
+            .bg-primary {
+                background-color: var(--color-primary) !important;
+            }
+            .bg-secondary {
+                background-color: var(--color-secondary);
+            }
+            .bg-dark {
+                background-color: var(--color-dark);
+            }
+            .bg-light {
+                background-color: transparent !important;
+            }
+            .text-primary {
+                color: var(--color-primary);
+            }
+            .hover\:bg-secondary:hover {
+                background-color: var(--color-secondary);
+            }
+        }
+
+        @layer utilities {
+            .animate-fade-in {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
+
+        .message-ai {
+            background-color: var(--color-light);
+        }
+
+        .welcome-icon-bg {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .chat-container {
+            container-type: inline-size;
+        }
+
+        @container (min-width: 768px) {
+            .chat-sidebar {
+                display: flex;
+            }
+        }
+
+        @container (max-width: 767px) {
+            .chat-messages {
+                padding: var(--message-spacing);
+            }
+        }
+
+        /* Fix for the welcome message icon */
+        .bg-primary\/10 {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        /* Add styles for better message formatting */
+        .prose {
+            max-width: 65ch;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        /* Chat message container spacing */
+        #chat-messages {
+            padding: 1rem !important;
+        }
+        
+        /* Message bubble styles */
+        .chat-bubble, .p-3 {
+            padding: 0.5rem 0.75rem !important;
+        }
+        
+        /* Input area styles */
+        .chat-form textarea, #user-input {
+            padding: 0.5rem 0.75rem !important;
+        }
+
+        /* Adjust spacing between messages */
+        .space-y-6 > * + * {
+            margin-top: 0.75rem !important;
+        }
+
+        /* Message container padding */
+        .my-2 {
+            margin-top: 0.375rem !important;
+            margin-bottom: 0.375rem !important;
+        }
+
+        /* Better list formatting */
+        .prose div {
+            margin: 0.5em 0;
+        }
+        
+        /* Code block improvements */
+        .prose pre {
+            margin: 1.5em 0;
+            padding: 1.5rem;
+            background: #1f2937;
+            border-radius: 0.5rem;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+        
+        .prose pre code {
+            color: #e5e7eb;
+            font-size: 0.9em;
+            line-height: 1.7142857;
+            white-space: pre;
+            word-break: normal;
+            word-spacing: normal;
+            tab-size: 4;
+        }
+        
+        /* Inline code */
+        .prose code {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        /* List spacing */
+        .prose div.pl-4 {
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        /* Tighter markdown spacing */
+        .markdown-body {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .markdown-body p {
+            margin: 0.5em 0;
+        }
+        
+        .markdown-body pre {
+            margin: 0.5em 0;
+            padding: 0.8em;
+            background: #282c34;
+            border-radius: 0.375rem;
+        }
+        
+        .markdown-body code {
+            font-family: 'Menlo', Monaco, Consolas, monospace;
+            font-size: 0.9em;
+        }
+        
+        .markdown-body ul, .markdown-body ol {
+            margin: 0.3em 0;
+            padding-left: 1.5em;
+        }
+
+        /* Copy button styles */
+        .markdown-body .copy-button {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .markdown-body pre:hover .copy-button {
+            opacity: 1;
+        }
+
+        /* Success animation */
+        @keyframes copySuccess {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+
+        .copy-success {
+            animation: copySuccess 1.5s ease-in-out;
+        }
+
+        /* Textarea styles */
+        textarea#user-input {
+            line-height: 1.5;
+            height: 44px !important;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+            outline: none !important;
+            box-shadow: none !important;
+            resize: none;
+        }
+
+        /* Webkit scrollbar styles */
+        textarea#user-input::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        textarea#user-input::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        textarea#user-input::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        /* User message styles */
+        .bg-primary {
+            background-color: var(--color-primary) !important;
+        }
+
+        /* AI message styles */
+        .bg-gray-100 {
+            background-color: var(--ai-message-bg) !important;
+            color: var(--ai-message-text) !important;
+        }
+
+        /* Input box styles */
+        .border-blue-500 {
+            border-color: var(--color-primary) !important;
+        }
+
+        /* Send button color */
+        .text-blue-500 {
+            color: var(--color-primary) !important;
+        }
+        .hover\:text-blue-600:hover {
+            color: var(--color-secondary) !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Main Container - Fixed height -->
+    <div class="chat-container h-screen flex flex-col overflow-hidden">
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col h-full">
+            <!-- Header - Fixed -->
+            <div class="bg-white border-b px-4 py-4 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-base md:text-xl lg:text-2xl font-semibold text-gray-800">KnowFlow</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- RAG Toggle -->
+                    <div class="flex items-center space-x-2">
+                        <span id="rag-indicator" class="text-sm font-medium hidden">RAG ON</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="rag-toggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+                    
+                    <!-- Pencil Icon -->
+                    <i class="fas fa-pencil text-gray-600 hover:text-indigo-600 transition-colors cursor-pointer"></i>
+                </div>
+            </div>
+
+            <!-- Chat Messages - Scrollable -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-3 md:p-6 space-y-3 md:space-y-6">
+                <!-- Welcome Message -->
+                <div class="text-center text-gray-500 py-4 md:py-8">
+                    <div class="w-12 md:w-16 lg:w-20 h-12 md:h-16 lg:h-20 mx-auto mb-3 md:mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                        <i class="fas fa-brain text-lg md:text-2xl lg:text-3xl text-primary"></i>
+                    </div>
+                    <h3 class="text-base md:text-xl lg:text-2xl font-semibold mb-2">Hi, I am KnowFlow</h3>
+                    <p class="max-w-md mx-auto text-sm md:text-base lg:text-lg">Think it, ask it, learn it—your gateWAY to smarter education.</p>
+                </div>
+            </div>
+
+            <!-- Chat Input - Fixed at bottom -->
+            <div class="border-t bg-white p-4 flex-shrink-0">
+                <form id="chat-form">
+                    <div class="flex gap-1 md:gap-2 items-center">
+                        <!-- Attachment Button -->
+                        <button 
+                            type="button" 
+                            class="text-gray-600 hover:text-gray-900 p-1 md:p-2 opacity-50 cursor-not-allowed"
+                            onclick="document.getElementById('file-input').click()"
+                        >
+                            <i class="fas fa-paperclip text-base md:text-xl"></i>
+                        </button>
+                        <!-- Hidden File Input -->
+                        <input 
+                            type="file" 
+                            id="file-input" 
+                            class="hidden" 
+                            multiple
+                            disabled
+                        />
+                        <!-- Gallery Button -->
+                        <button 
+                            type="button" 
+                            class="text-gray-600 hover:text-gray-900 p-1 md:p-2"
+                        >
+                            <i class="fas fa-image text-base md:text-xl"></i>
+                        </button>
+                        <!-- Video Button -->
+                        <button 
+                            type="button" 
+                            class="text-gray-600 hover:text-gray-900 p-1 md:p-2"
+                        >
+                            <i class="fas fa-video text-base md:text-xl"></i>
+                        </button>
+                        <!-- Web Search Button -->
+                        <button 
+                            type="button" 
+                            class="text-gray-600 hover:text-gray-900 p-1 md:p-2"
+                        >
+                            <i class="fas fa-globe text-base md:text-xl"></i>
+                        </button>
+                        <!-- Local Model Button -->
+                        <button 
+                            type="button" 
+                            class="text-gray-600 hover:text-gray-900 p-1 md:p-2"
+                            id="local-model-button"
+                        >
+                            <i class="fas fa-microchip text-base md:text-xl"></i>
+                        </button>
+                        <div class="flex-1 flex gap-2 border-2 border-blue-500 rounded-lg overflow-hidden bg-white">
+                            <textarea 
+                                id="user-input"
+                                class="flex-1 p-2 md:p-3 text-sm md:text-base bg-transparent border-none focus:ring-0 resize-none overflow-y-auto"
+                                placeholder="Type your message..."
+                                style="height: 44px;"
+                            ></textarea>
+                            <button 
+                                type="submit" 
+                                class="px-2 md:px-4 text-blue-500 hover:text-blue-600 transition-colors flex items-center"
+                            >
+                                <i class="fas fa-paper-plane text-base md:text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawing Canvas Container -->
+    <div id="drawing-container" class="fixed inset-0 bg-white transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b bg-gray-50">
+            <h2 class="text-xl font-semibold">Drawing Board</h2>
+            <div class="flex items-center gap-4">
+                <!-- Drawing Tools -->
+                <!-- Pencil Tool -->
+                <button id="pencil-tool" class="tool-btn active p-2 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-pen text-xl"></i>
+                </button>
+                
+                <!-- Eraser Tool -->
+                <button id="eraser-tool" class="tool-btn p-2 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-eraser text-xl"></i>
+                </button>
+
+                <!-- Clear Canvas -->
+                <button id="clear-canvas" class="tool-btn p-2 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-trash text-xl"></i>
+                </button>
+                
+                <!-- Line Width -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600">Width:</label>
+                    <input type="range" id="line-width" min="1" max="50" value="5" class="w-24">
+                    <span id="width-value" class="text-sm text-gray-600">5px</span>
+                </div>
+                
+                <!-- Color Picker -->
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600">Color:</label>
+                    <input type="color" id="color-picker" value="#000000" class="w-8 h-8 p-0 border-0 rounded cursor-pointer">
+                </div>
+
+                <!-- Close Button -->
+                <button id="close-drawing" class="text-gray-600 hover:text-red-500 transition-colors ml-4">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="flex-1 relative">
+            <canvas id="drawing-canvas" class="absolute inset-0 w-full h-full"></canvas>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+# Web Server
+fastapi
+uvicorn
+python-multipart
+jinja2
+
+# Environment and Utils
+python-dotenv
+requests
+pydantic
+nest_asyncio
+
+# AI and ML
+google-genai
+# genai==0.3.0
+google-generativeai
+sentence-transformers
+llama-index-core
+llama-index-embeddings-huggingface
+llama-index-readers-file
+llama-parse
+chromadb
+
+
+# Google Cloud Services
+google-cloud-texttospeech
+
+# Additional dependencies
+aiohttp
+
+# WebSocket
+websockets==14.1
+asyncio==3.4.3
+
+# Gradio
+gradio-client
+
+# Image processing
+Pillow
+pytesseract
+
+
