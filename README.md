@@ -76,7 +76,7 @@ A modern, feature-rich AI assistant platform built with FastAPI, Gemini, and Tav
 - For macOS/Linux: Terminal with sudo access
 
 ### Environment Variables
-Create a `.env` file with:
+There is a `.env` file you have to put get and put the api keys in it:
 ```env
 GEMINI_API_KEY=your_gemini_api_key
 # Get from Google AI Studio: https://makersuite.google.com/app/apikey
