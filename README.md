@@ -98,7 +98,7 @@ GOOGLE_APPLICATION_CREDENTIALS=credentials/google-cloud-credentials.json
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/zeroinfinity03/KnowFlow.git
 cd knowflow
 ```
 
