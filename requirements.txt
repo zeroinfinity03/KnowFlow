@@ -1,5 +1,5 @@
 # Web Server
-fastapi
+fastapi[standard]
 uvicorn
 python-multipart
 jinja2
@@ -21,12 +21,26 @@ llama-index-readers-file
 llama-parse
 chromadb
 
+langchain_google_genai
+langchain>=0.1.0
+pandas>=2.0
+matplotlib>=3.7
+seaborn>=0.12
+langchain-community>=0.1.0
+langchain_experimental
+tabulate
+plotly
+langchain-ollama
+langchain-huggingface
+transformers[agents]
+
 
 # Google Cloud Services
 google-cloud-texttospeech
 
 # Additional dependencies
 aiohttp
+certifi
 
 # WebSocket
 websockets==14.1
@@ -39,4 +53,16 @@ gradio-client
 Pillow
 pytesseract
 
+
+langchain>=0.1.0
+pandas>=2.0
+matplotlib>=3.7
+seaborn>=0.12
+langchain-community>=0.1.0
+langchain_experimental
+tabulate
+plotly
+langchain-ollama
+langchain-huggingface
+transformers[agents]
 
