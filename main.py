@@ -9,6 +9,7 @@ from agents.rag_agent import RagAgent
 from agents.web_agent import WebAgent
 from agents.local_agent import LocalAgent
 from agents.live_agent import LiveAgent
+from agents.dataframe_agent import DataFrameAgent
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
@@ -32,6 +33,7 @@ templates = Jinja2Templates(directory="templates")
 # Store user sessions with timestamps
 user_sessions: Dict[str, tuple[TextAgent, datetime]] = {}
 local_sessions: Dict[str, tuple[LocalAgent, datetime]] = {}  # Add local sessions dictionary
+dataframe_sessions: Dict[str, DataFrameAgent] = {}  # Store DataFrameAgent sessions
 rag_agent = RagAgent()  # Initialize RAG agent
 live_agent = LiveAgent()  # Initialize live agent instance
 
@@ -82,11 +84,19 @@ async def chat(message: ChatMessage):
                         yield json.dumps({"chunk": chunk}, ensure_ascii=False) + "\n"
             return StreamingResponse(generate_response(), media_type="application/x-ndjson")
         elif message.is_rag_mode:
-            # RAG mode takes precedence over local mode
-            answer = await rag_agent.answer_question(message.message, message.session_id)
-            async def generate_response():
-                yield answer + "\n"
-            return StreamingResponse(generate_response(), media_type="application/x-ndjson")
+            # Check if we have a DataFrame agent for this session
+            if message.session_id in dataframe_sessions:
+                df_agent = dataframe_sessions[message.session_id]
+                async def generate_response():
+                    async for response in df_agent.analyze(message.message):
+                        yield response + "\n"  # Response is already JSON formatted
+                return StreamingResponse(generate_response(), media_type="application/x-ndjson")
+            else:
+                # Use RAG agent for non-CSV files
+                answer = await rag_agent.answer_question(message.message, message.session_id)
+                async def generate_response():
+                    yield answer + "\n"
+                return StreamingResponse(generate_response(), media_type="application/x-ndjson")
         elif message.is_video_mode and message.audio_data and message.image_data:
             # Use ObjectDetectionAgent for audio + image input
             object_detection_agent = ObjectDetectionAgent()
@@ -171,6 +181,16 @@ async def upload_file(
             filename=file.filename,
             session_id=session_id
         )
+        
+        # If it's a CSV file, store the agent in dataframe_sessions
+        if result.get("agent") == "dataframe":
+            # Use DataFrameAgent
+            df_agent = DataFrameAgent()
+            if await df_agent.load_dataframe(file_content, file.filename):
+                dataframe_sessions[session_id] = df_agent
+                return JSONResponse(content={"status": "success", "message": "CSV file loaded successfully"})
+            else:
+                raise Exception("Failed to load CSV file")
         
         return JSONResponse(content={"status": "success", "message": "Document processed successfully"})
         
