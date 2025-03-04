@@ -124,6 +124,15 @@ class RagAgent:
         try:
             mime_type, _ = mimetypes.guess_type(filename)
             
+            # Handle CSV files using DataFrame Agent
+            if mime_type == 'text/csv':
+                from .dataframe_agent import DataFrameAgent
+                df_agent = DataFrameAgent()
+                if await df_agent.load_dataframe(file_content, filename):
+                    return {"status": "success", "message": "CSV file loaded successfully", "agent": "dataframe"}
+                else:
+                    raise Exception("Failed to load CSV file")
+            
             # Handle images separately using Tesseract OCR
             if mime_type and mime_type.startswith('image/'):
                 extracted_text = await self._process_image(file_content)
