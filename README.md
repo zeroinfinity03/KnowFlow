@@ -1,6 +1,12 @@
 # KnowFlow - AI Assistant Platform
 
-A modern, feature-rich AI assistant platform built with FastAPI, Gemini, and Tavily, offering multiple interaction modes and advanced capabilities.
+A comprehensive, feature-rich AI assistant platform built with FastAPI, Google Gemini, and Tavily, offering multiple interaction modes and advanced capabilities for both online and offline use.
+
+## Project Overview
+
+KnowFlow is an intelligent assistant platform that combines multiple AI technologies into a unified, user-friendly interface. It offers seamless integration between various interaction modes including text chat, web search, document analysis, image generation, local AI processing, visual Q&A, and an interactive drawing assistant.
+
+The application uses a modular architecture with specialized agents for different capabilities, making it highly extensible and maintainable. It supports both cloud-based processing using cutting-edge models like Google's Gemini 2.0 Flash and local, privacy-focused operation using Meta's Llama 3.2 model through Ollama.
 
 ## Key Features
 
@@ -23,6 +29,7 @@ A modern, feature-rich AI assistant platform built with FastAPI, Gemini, and Tav
 - Lightweight yet powerful responses
 - Privacy-focused local computation
 - Markdown formatting and code highlighting
+- Message history stored in SQLite with semantic search
 
 ### 4. Image Generation
 - Generate images from text descriptions
@@ -35,21 +42,47 @@ A modern, feature-rich AI assistant platform built with FastAPI, Gemini, and Tav
 - Supports multiple file formats (PDF, DOCX, TXT, etc.)
 - Semantic search using ChromaDB
 - Context-aware responses based on uploaded documents
+- Special handling for CSV data with visualization capabilities
 
 ### 6. Live Drawing Assistant
 - Interactive drawing canvas
-- Real-time AI assistance
+- Real-time AI assistance with voice feedback
 - Color picker and drawing tools
 - Screen capture integration
 - Voice interaction with audio feedback
+- WebSocket-based real-time communication
 
 ### 7. Visual Question Answering
 - Ask questions about images using voice
 - Multilingual support (including Hindi and Spanish)
 - Real-time camera integration
 - Voice responses using Google Text-to-Speech
+- Image analysis and interpretation
 
-## Technical Stack
+## Technical Architecture
+
+### Core Components
+
+#### Backend Architecture
+- **FastAPI Framework**: Provides high-performance API endpoints with WebSocket support
+- **Modular Agent System**: Specialized agents for different AI capabilities
+  - `TextAgent`: Standard chat using Gemini 2.0 Flash
+  - `WebAgent`: Web search and content extraction via Tavily
+  - `RagAgent`: Document processing with vector search
+  - `ImageGenAgent`: Text-to-image generation
+  - `LocalAgent`: Offline processing with Ollama
+  - `LiveAgent`: Real-time drawing and voice interaction
+  - `ObjectDetectionAgent`: Visual processing and analysis
+  - `DataFrameAgent`: Data analysis and visualization
+
+#### Data Storage
+- **ChromaDB**: Vector database for document embeddings and semantic search
+- **SQLite**: Local storage for conversation history and session management
+- **File System**: Temporary storage for document processing
+
+#### Real-time Communication
+- **WebSockets**: For live interaction features and streaming responses
+- **Async Processing**: Asynchronous handlers for responsive user experience
 
 ### Core Technologies
 - **Backend**: FastAPI, Python 3.11
@@ -217,7 +250,7 @@ Note: The kill commands forcefully terminate processes. Only use them if `Ctrl+C
 ### Local Model Chat
 1. Click the microchip icon to enable local model mode
 2. Type your question
-3. Get responses from the Gemma 2B model running locally
+3. Get responses from the Llama 3.2 3B model running locally
 4. Enjoy privacy-focused, offline processing
 
 ### Image Generation
@@ -228,17 +261,19 @@ Note: The kill commands forcefully terminate processes. Only use them if `Ctrl+C
 
 ### RAG Mode
 1. Toggle RAG mode
-2. Upload documents
+2. Upload documents (PDF, DOCX, TXT, etc.) or CSV files
 3. Ask questions about the documents
+4. For CSV files, use natural language to analyze and visualize data
 
 ### Live Drawing
 1. Click the pencil icon
-2. Use drawing tools
-3. Speak to get AI assistance
+2. Use drawing tools on the canvas
+3. Speak to get AI assistance in real-time
+4. Receive voice feedback from the AI assistant
 
 ### Visual Q&A
 1. Click the video icon
 2. Allow camera and microphone access
-3. Ask questions about what you see
-4. Get voice responses
+3. Ask questions about what you see in the camera
+4. Get voice responses with detailed analysis
 
