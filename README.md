@@ -243,6 +243,7 @@ Note: The kill commands forcefully terminate processes. Only use them if `Ctrl+C
 1. Type your question in the chat input
 2. The system will:
    - Search the web using Tavily API
+   - First I used Playwright, but it takes time on resource contrained devices to get the answer, So I switched to tavily.
    - Extract relevant content from top sources
    - Generate a comprehensive answer using Gemini
    - Stream the response in real-time
