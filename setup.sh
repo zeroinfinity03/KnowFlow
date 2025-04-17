@@ -96,6 +96,13 @@ pip install uv
 echo "Installing project requirements..."
 uv pip install -r requirements.txt
 
+# Start Ollama service in the background
+echo "Starting Ollama service..."
+ollama serve > /dev/null 2>&1 &
+OLLAMA_PID=$!
+echo "Waiting for Ollama service to initialize..."
+sleep 5  # Give Ollama time to start up
+
 # Pull Llama 3.2 model
 echo "Pulling Llama 3.2 model..."
 ollama pull llama3.2
