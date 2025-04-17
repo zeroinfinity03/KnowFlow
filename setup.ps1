@@ -79,6 +79,12 @@ python -m pip install uv
 Write-Host "Installing project requirements..."
 uv pip install -r requirements.txt
 
+# Start Ollama service in the background
+Write-Host "Starting Ollama service..."
+Start-Process -FilePath "ollama" -ArgumentList "serve" -WindowStyle Hidden
+Write-Host "Waiting for Ollama service to initialize..."
+Start-Sleep -Seconds 5  # Give Ollama time to start up
+
 # Pull Llama 3.2 model
 Write-Host "Pulling Llama 3.2 model..."
 ollama pull llama3.2
