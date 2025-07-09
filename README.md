@@ -109,7 +109,7 @@ The application uses a modular architecture with specialized agents for differen
 - For macOS/Linux: Terminal with sudo access
 
 ### Environment Variables
-There is a `.env` file you have to put get and put the api keys in it:
+Create a  `.env` file in the main project directory and put all these api keys in it:
 ```env
 GEMINI_API_KEY=your_gemini_api_key
 # Get from Google AI Studio: https://makersuite.google.com/app/apikey
@@ -123,16 +123,16 @@ HUGGINGFACE_API_KEY=your_huggingface_api_key
 
 GOOGLE_APPLICATION_CREDENTIALS=credentials/google-cloud-credentials.json
 # (dont change this path)
-# Get from Google Cloud Console: https://console.cloud.google.com/apis/credentials
-# Download JSON and save in credentials/ folder which is already there, just paste it.
+# Get the key from Google Cloud Console: https://console.cloud.google.com/apis/credentials
+# Download JSON and save in credentials/ folder, first create this folder in the main project directory.
 ```
 
 ### Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/zeroinfinity03/KnowFlow.git
-cd knowflow
+git clone https://github.com/zeroinfinity03/knowflow-beta1.0.git
+cd knowflow-beta1.0
 ```
 
 2. Choose the appropriate setup method for your operating system:
